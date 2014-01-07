@@ -26,6 +26,11 @@
 		- Switching between drive speeds with the driving gamepad's triggers.
 */
 
+// Constants:
+const byte clawDownPosition = 250;
+const byte clawUpPosition = 140;
+const byte clawClosedPosition = 130;
+
 #include "JoystickDriver.c"
 #include "GamepadAccessors.h"
 #include "DriverController.h"
@@ -34,6 +39,10 @@
 task main()
 {
 	waitForStart();
+
+	servo[ClawVertical] = clawDownPosition;
+	servo[ClawLeft] = 0;
+	servo[ClawRight] = 255;
 
 	// Tasks related to the Driver controller
 	StartTask(DPadDrive);

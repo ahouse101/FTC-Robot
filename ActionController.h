@@ -1,6 +1,6 @@
 // Globals:
 int spinnerSpeed = 100;				// The speed of the "spinner" motor to be used when raising the flag
-bool spongeClawDown = false; 		// If the SpongeClaw is currently in the up position
+bool spongeClawDown = true; 		// If the SpongeClaw is currently in the up position
 bool spongeClawClosed = false;	// If the SpongeClaw is currently in the closed position
 
 // This task deals with the 8-way directional pad (TopHat).
@@ -74,17 +74,32 @@ task SpinnerSpin()
 
 void MoveClawDown()
 {
-
+	servo[ClawVertical] = clawDownPosition;
+	wait1Msec(200);
+	spongeClawDown = true;
 }
 
 void MoveClawUp()
 {
-
+	servo[ClawVertical] = clawUpPosition;
+	wait1Msec(200);
+	spongeClawDown = false;
 }
 
 void ToggleClaw()
 {
-
+	if (spongeClawClosed)
+	{
+		servo[ClawLeft] = 0;
+		servo[ClawRight] = 255;
+	}
+	else
+	{
+		servo[ClawLeft] = clawClosedPosition;
+		servo[ClawRight] = 255 - clawClosedPosition;
+	}
+	wait1Msec(200);
+	spongeClawClosed = !spongeClawClosed;
 }
 
 // This task deals with button 2 (lowest in the group of four) and the two bumpers.

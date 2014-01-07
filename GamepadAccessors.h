@@ -15,7 +15,7 @@ bool getSlowDriveBumper()
 
 bool getSpinnerButton()
 {
-	return joy2Btn(2) == 1;
+	return joy2Btn(3) == 1;
 }
 
 bool getClawDownBumper()
