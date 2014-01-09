@@ -1,8 +1,8 @@
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTMotor,  HTServo)
 #pragma config(Motor,  mtr_S1_C1_1,     leftDrive,     tmotorTetrix, PIDControl, encoder)
 #pragma config(Motor,  mtr_S1_C1_2,     rightDrive,    tmotorTetrix, PIDControl, reversed, encoder)
-#pragma config(Motor,  mtr_S1_C2_1,     towerLow,      tmotorTetrix, openLoop, encoder)
-#pragma config(Motor,  mtr_S1_C3_1,     towerHigh,     tmotorTetrix, openLoop, reversed, encoder)
+#pragma config(Motor,  mtr_S1_C2_1,     towerLow,      tmotorTetrix, openLoop, reversed, encoder)
+#pragma config(Motor,  mtr_S1_C3_1,     towerHigh,     tmotorTetrix, openLoop, encoder)
 #pragma config(Motor,  mtr_S1_C3_2,     spinner,       tmotorTetrix, openLoop, encoder)
 #pragma config(Servo,  srvo_S1_C4_1,    ClawVertical,         tServoStandard)
 #pragma config(Servo,  srvo_S1_C4_2,    ClawLeft,             tServoStandard)
@@ -23,26 +23,45 @@
 
 	This version supports:
 		- Driving with the driving gamepad's D-pad
-		- Switching between drive speeds with the driving gamepad's triggers.
+		- Switching between drive speeds with the driving gamepad's bumpers
+		- Spinning the spinner motor to raise the flag with the action gamepad's buttons 3 and 4
+		- Moving the Tower with the action gamepad's joysticks
+		- Changing the single motor which will be moved in the tower with the action gamepad's triggers
+		- Moving the SpongeClaw up and down with the action gamepad's bumpers
+		- Opening and closing the SpongeClaw with the actions gamepad's button 2.
 */
 
 // Constants:
-const byte clawDownPosition = 250;
-const byte clawUpPosition = 140;
-const byte clawClosedPosition = 130;
+const int clawDownPosition = 250;
+const int clawUpPosition = 140;
+const int clawClosedPosition = 130;
+
+// Action Globals:
+int spinnerSpeed = 100;				// The speed of the "spinner" motor to be used when raising the flag
+bool spongeClawDown = true; 		// If the SpongeClaw is currently in the up position
+bool spongeClawClosed = false;	// If the SpongeClaw is currently in the closed position
+bool towerLowMotorChosen = true;	// If the low motor on the tower should be moved when we're moving one motor at a time
+
+// Driver Globals:
+byte drivePower = 100;
 
 #include "JoystickDriver.c"
 #include "GamepadAccessors.h"
 #include "DriverController.h"
 #include "ActionController.h"
 
-task main()
+void initalizeRobot()
 {
-	waitForStart();
-
 	servo[ClawVertical] = clawDownPosition;
 	servo[ClawLeft] = 0;
 	servo[ClawRight] = 255;
+}
+
+task main()
+{
+	initializeRobot();
+
+	waitForStart();
 
 	// Tasks related to the Driver controller
 	StartTask(DPadDrive);
@@ -50,7 +69,8 @@ task main()
 
 	// Tasks related to the Action controller
 	StartTask(SpinnerSpin);
-	StartTask(DPadTowerMove);
+	StartTask(JoystickTowerMove);
+	StartTask(TowerMotorChange);
 	StartTask(SpongeClawMove);
 
 	while(true)

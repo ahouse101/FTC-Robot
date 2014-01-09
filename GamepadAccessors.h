@@ -1,3 +1,23 @@
+int getTowerDualJoystick()
+{
+	return joystick.joy2_y1;
+}
+
+int getTowerSingleJoystick()
+{
+	return joystick.joy2_y2;
+}
+
+bool getTowerLowButton()
+{
+	return joy2Btn(7) == 1;
+}
+
+bool getTowerHighButton()
+{
+	return joy2Btn(8) == 1;
+}
+
 int getDriveDPad()
 {
 	return joystick.joy1_TopHat;
@@ -13,9 +33,14 @@ bool getSlowDriveBumper()
 	return joy1Btn(6) == 1;
 }
 
-bool getSpinnerButton()
+bool getSpinnerFastButton()
 {
 	return joy2Btn(3) == 1;
+}
+
+bool getSpinnerSlowButton()
+{
+	return joy2Btn(4) == 1;
 }
 
 bool getClawDownBumper()

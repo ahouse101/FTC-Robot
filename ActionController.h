@@ -1,55 +1,55 @@
-// Globals:
-int spinnerSpeed = 100;				// The speed of the "spinner" motor to be used when raising the flag
-bool spongeClawDown = true; 		// If the SpongeClaw is currently in the up position
-bool spongeClawClosed = false;	// If the SpongeClaw is currently in the closed position
-
 // This task deals with the 8-way directional pad (TopHat).
 // This DPad governs the movement of the robot's Tower, which uses two motors in series.
 // The top and bottom directions move the tower up and down by "marks."
 // The side directions move the tower to fully extended/collapsed positions.
-task DPadTowerMove()
+task JoystickTowerMove()
 {
 	while (true)
 	{
 		getJoystickSettings(joystick);
 
-		byte padValue = getDriveDPad();
-
-		switch (padValue)
+		if (abs(getTowerDualJoystick()) > 10)	// We're using the main joystick
 		{
-			case 0:		// Extend the tower by one mark
-
-				break;
-			case 2:		// Fully extend the tower
-
-				break;
-			case 4:		// Collapse the tower by one mark
-
-				break;
-			case 6:		// Fully collapse the tower
-
-				break;
-			default:		// Do nothing
-				break;
+			int scaledSpeed = getTowerDualJoystick() * 100 / 127;
+			motor[towerHigh] = scaledSpeed;
+			motor[towerLow] = scaledSpeed;
 		}
-
-		// TEMPORARY
-		if (joy2Btn(1))
+		else if 	(abs(getTowerSingleJoystick()) > 10)	// The single-motor joystick is being used instead
 		{
-			motor[towerHigh] = 0;
-			motor[towerLow] = 25;
+			int scaledSpeed = getTowerSingleJoystick() * 100 / 127 / 2;
+			if (towerLowMotorChosen)
+			{
+				motor[towerLow] = scaledSpeed;
+				motor[towerHigh] = 0;
+			}
+			else
+			{
+				motor[towerLow] = 0;
+				motor[towerHigh] = scaledSpeed;
+			}
 		}
-		else
+		else	// Neither joystick has been moved outside the deadzone
 		{
-			motor[towerHigh] = 0;
 			motor[towerLow] = 0;
+			motor[towerHigh] = 0;
 		}
-		// END TEMPORARY
 
 		wait1Msec(10);	// Hand control back to the task scheduler
 	}
 }
 
+task TowerMotorChange()
+{
+	while (true)
+	{
+		getJoystickSettings(joystick);
+
+		if (getTowerLowButton()) towerLowMotorChosen = true;
+		else if (getTowerHighButton()) towerLowMotorChosen = false;
+
+		wait1Msec(10);	// Hand control back to the task scheduler
+	}
+}
 
 task SpinnerSpin()
 {
@@ -57,9 +57,13 @@ task SpinnerSpin()
 	{
 		getJoystickSettings(joystick);
 
-		if (getSpinnerButton())
+		if (getSpinnerFastButton())
 		{
 			spinnerSpeed = 100;
+		}
+		else if (getSpinnerSlowButton())
+		{
+			spinnerSpeed = 20;
 		}
 		else
 		{

@@ -1,6 +1,3 @@
-// Globals:
-byte drivePower = 100;
-
 // This task deals with the 8-way directional pad (TopHat).
 // This DPad controls the robot's two drive motors.
 task DPadDrive()
