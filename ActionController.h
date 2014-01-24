@@ -78,14 +78,16 @@ task SpinnerSpin()
 
 void MoveClawDown()
 {
-	servo[ClawVertical] = clawDownPosition;
+	servo[ClawLeftVertical] = clawDownPosition;
+	servo[ClawRightVertical] = 220 - clawDownPosition;
 	wait1Msec(200);
 	spongeClawDown = true;
 }
 
 void MoveClawUp()
 {
-	servo[ClawVertical] = clawUpPosition;
+	servo[ClawLeftVertical] = clawUpPosition;
+	servo[ClawRightVertical] = 220 - clawUpPosition;
 	wait1Msec(200);
 	spongeClawDown = false;
 }
