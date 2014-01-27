@@ -42,7 +42,7 @@ const int clawClosedPosition = 135;
 int spinnerSpeed = 100;				// The speed of the "spinner" motor to be used when raising the flag
 bool spongeClawDown = true; 		// If the SpongeClaw is currently in the up position
 bool spongeClawClosed = false;	// If the SpongeClaw is currently in the closed position
-bool towerLowMotorChosen = true;	// If the low motor on the tower should be moved when we're moving one motor at a time
+bool towerLowMotorChosen = false;// If the low motor on the tower should be moved when we're moving one motor at a time
 
 // Driver Globals:
 byte drivePower = 100;

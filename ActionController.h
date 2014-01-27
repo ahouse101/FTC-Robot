@@ -76,20 +76,22 @@ task SpinnerSpin()
 	}
 }
 
-void MoveClawDown()
+void ToggleClawVertical()
 {
-	servo[ClawLeftVertical] = clawDownPosition;
-	servo[ClawRightVertical] = 220 - clawDownPosition;
-	wait1Msec(200);
-	spongeClawDown = true;
-}
-
-void MoveClawUp()
-{
-	servo[ClawLeftVertical] = clawUpPosition;
-	servo[ClawRightVertical] = 220 - clawUpPosition;
-	wait1Msec(200);
-	spongeClawDown = false;
+	if (spongeClawDown)
+	{
+		servo[ClawLeftVertical] = clawUpPosition;
+		servo[ClawRightVertical] = 220 - clawUpPosition;
+		wait1Msec(200);
+		spongeClawDown = false;
+	}
+	else
+	{
+		servo[ClawLeftVertical] = clawDownPosition;
+		servo[ClawRightVertical] = 220 - clawDownPosition;
+		wait1Msec(200);
+		spongeClawDown = true;
+	}
 }
 
 void ToggleClaw()
@@ -116,19 +118,13 @@ task SpongeClawMove()
 	while (true)
 	{
 		getJoystickSettings(joystick);
-		bool up = getClawUpBumper();				// True if depressed, false if not
-		bool down = getClawDownBumper();			// == above
-		bool toggle = getClawToggleButton();	// == above
+		bool upDown = getClawVerticalToggleBumper();			// True if depressed, false if not
+		bool toggle = getClawToggleButton();					// == above
 
-		if (up)
+		if (upDown)
 		{
-			if (spongeClawDown) MoveClawUp();
+			ToggleClawVertical();
 		}
-		else if (down)
-		{
-			if (!spongeClawDown) MoveClawDown();
-		}
-
 		if (toggle)
 		{
 			ToggleClaw();
