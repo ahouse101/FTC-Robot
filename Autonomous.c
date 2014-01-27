@@ -67,17 +67,26 @@ void initializeRobot()
   	tHTIRS2DSPMode _mode = DSP_1200;
 
 	lowerClaw();
-	closeClaw();
-
-	wait1Msec(1000);
-
-	raiseClaw();
+	openClaw();
 }
 
 void drive(byte power)
 {
 	motor[leftDrive] = power;
 	motor[rightDrive] = power;
+}
+
+void grabBlock()
+{
+	servoChangeRate[ClawLeft] = 1;
+	servoChangeRate[ClawRight] = 1;
+	closeClaw();
+	servoChangeRate[ClawLeft] = 10;
+	servoChangeRate[ClawRight] = 10;
+
+	wait1Msec(500);
+
+	raiseClaw();
 }
 
 void driveToIRSensor()
@@ -101,7 +110,6 @@ void driveToIRSensor()
 		}
 	}
 
-	wait1Msec(500);
 	drive(0);
 }
 
@@ -138,12 +146,63 @@ void faceIRSensor()
 	drive(0);
 }
 
+void approachIRSensor()
+{
+	drive(10);
+
+	while (true)
+	{
+		if (!HTIRS2readAllACStrength(HTIRS2, acS1, acS2, acS3, acS4, acS5 ))
+   		break; // I2C read error occurred
+   	if (acS3 > 190)
+   		break;
+  	}
+
+  	drive(0);
+}
+
+void moveTower(bool up)
+{
+	motor[towerHigh] = up ? 100 : -100;
+	motor[towerLow] = up ? 100 : -100;
+
+	wait1Msec(1600);
+
+	motor[towerHigh] = 0;
+	motor[towerLow] = 0;
+}
+
+void goToBridge()
+{
+	drive(100);
+	wait1Msec(3000);
+	motor[IRisLeft ? leftDrive : rightDrive] = 0;
+	wait1Msec(1000);
+	drive(100);
+	wait1Msec(2000);
+	motor[IRisLeft ? leftDrive : rightDrive] = 0;
+	wait1Msec(1000);
+	drive(1000);
+	wait1Msec(3000);
+	drive(0);
+}
+
 task main()
 {
 	initializeRobot();
 
 	waitForStart();
 
+	grabBlock();
 	driveToIRSensor();
 	faceIRSensor();
+	moveTower(true);
+	approachIRSensor();
+	openClaw();
+	moveTower(false);
+
+	//goToBridge();
+
+	while (true)
+	{}
 }
